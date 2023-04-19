@@ -13,17 +13,16 @@ class CreateGamesTable extends Migration
      */
     public function up()
     {
-        //secret_number,score,nb_attempts,evaluation,outcome and rank
         Schema::create('games', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-            $table->string('name');
-            $table->string('age');
-            $table->string('secret_number');
-            $table->tinyInteger('nb_attempts');
-            $table->string('evaluation');
-            $table->boolean('outcome');
-            $table->float('rank');
+            $table->string('name')->nullable();
+            $table->tinyInteger('age')->nullable();
+            $table->string('secret_number')->nullable();
+            $table->tinyInteger('nb_attempts')->nullable();
+            $table->float('evaluation')->nullable();
+            $table->boolean('outcome')->nullable();
+            $table->boolean('elapsed_time')->nullable();
+            $table->float('rank')->nullable();
         });
     }
 

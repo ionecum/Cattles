@@ -21,9 +21,16 @@ class GameController extends Controller
      */
     public function start(Request $request)
     {
+        if(!$this->checkname($request->name) || !$this->checkage($request->age)){
+            die("invalid input");
+        }
+
+        // The constant EXPIRE is defined in routes/web.php
+        $expire = time() + EXPIRE;
+        $request->session()->put('expire_time', $expire);
         $request->session()->put('name', $request->name);
         $request->session()->put('age', $request->age);
-        if(setcookie("game", $this->secretNumber, time()+300, "/", "", false, true)){
+        if(setcookie("game", $this->secretNumber, $expire, "/", "", false, true)){
             
             //var_dump($this->secret);
             $this->combination($request);    
@@ -43,13 +50,23 @@ class GameController extends Controller
         /* If the number is 999, it's the first time this function is running and the user did not send a guess yet. At this stage, the frontend should have a form to prompt the user's guess. */
         if($number != "999"){
             // implement number validation
+            if(!$this->checkguess($number, SIZE)){
+                die("Invalid number");
+            }
             
             if(isset($_COOKIE['game']) && $_COOKIE['game'] == true){
                 /* The secret number and the result are echoed for debugging purposes. Comment 
                 the vardump and the echo and uncomment the return to get a real JSON response in production */
                 var_dump($_COOKIE['game']). " ";
+                
                 //return response()->json($this->game->combinate($request, $_COOKIE['game'], $number));
                 echo response()->json($this->game->combinate($request, $_COOKIE['game'], $number));
+                
+                if($request->session()->get('gameover') == 1){
+                    die("computed ran");
+                    $this->computeRank($request);
+                }
+                
             }else{
                 // todo: call something to save the data
                 $this->endGame($request);
@@ -77,9 +94,41 @@ class GameController extends Controller
      * @param void
      * @return int
      */
-    private function generateNumber($SIZE=4)
+    private function generateNumber()
     {
         // array_flip guarantees that choosen number never begins with 0
-        return implode(array_rand(array_flip(range(1,9)), $SIZE));
+        return implode(array_rand(array_flip(range(1,9)), SIZE));
+    }
+
+    /**
+     * checkname - Performs a simple validation for the name
+     * @param $name string
+     * @return boolean
+     */
+    private function checkname($name)
+    {
+        return preg_match("/^[A-Za-z]{2,16}$/", $name);
+    }
+
+    /**
+     * checkage - Performs a simple validation for age
+     * @param $age int
+     * @return boolean
+     */
+    private function checkage($age)
+    {
+        return preg_match("/^[1-9][0-9]$/", $age);
+    }
+
+    /**
+     * checkguess - Performs a simple validation for the number
+     * @param $g string
+     * @param $s constant int
+     * @return boolean
+     */
+    private function checkguess($g, $s)
+    {
+      return count(str_split($g)) == $s &&
+        preg_match("/^[1-9]{{$s}}$/", $g);
     }
 }
