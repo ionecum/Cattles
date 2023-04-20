@@ -14,7 +14,7 @@ use App\Http\Controllers\GameController;
 |
 */
 
-define('EXPIRE', 300); // The expiration time for the game
+define('EXPIRE_IN', 300); // The expiration time for the game
 define('SIZE', 4); // Size of secret and guess number
 
 Route::get('/', function () {

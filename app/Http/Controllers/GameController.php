@@ -3,8 +3,34 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Games;
 
+
+
 class GameController extends Controller
 {
+    /**
+     * @OA\Get(
+     *    path="/game",
+     *    operationId="index",
+     *    tags={"Bull", "Cows", "game"},
+     *    summary="Play Bull and Cows online!",
+     *    description="This application will allow you to play the Bull&Cows game.",
+     *    @OA\Parameter(name="name", in="query", description="name", required=true,
+     *        @OA\Schema(type="string")
+     *    ),
+     *    @OA\Parameter(name="age", in="query", description="the age of the user", required=true,
+     *        @OA\Schema(type="integer")
+     *    ),
+     *    @OA\Parameter(name="game", in="query", description="an instance to Games model", required=true
+     *    ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer", example="200"),
+     *             @OA\Property(property="data",type="object")
+     *          )
+     *       )
+     *  )
+     */
     private $game; // the game model
     private $name; // the name of the user
     private $age; // the age of the user
@@ -14,6 +40,27 @@ class GameController extends Controller
         $this->game = new Games();
         $this->secretNumber = $this->generateNumber();
     }
+
+    /**
+     * 
+     * @OA\Post(
+     *      path="/game/start/<name>/<age>",
+     *      
+     *      operationId="initialize",
+     *      tags={"Initialization"},
+     *      summary="Initialization of the game",
+     *      description="Initialize the game",
+     *      @OA\RequestBody(
+     *         required=true,
+     *         
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\JsonContent(
+     *             @OA\Property(property="result", type="bool", example=""),
+     *          )
+     *       )
+     *  )
+     */
     /**
      * Start the game by initializing data and launche the first match by calling combination().
      *
@@ -25,20 +72,44 @@ class GameController extends Controller
             die("invalid input");
         }
 
-        // The constant EXPIRE is defined in routes/web.php
-        $expire = time() + EXPIRE;
+        // The constant EXPIRE_IN is defined in routes/web.php
+        $expire = time() + EXPIRE_IN;
         $request->session()->put('expire_time', $expire);
         $request->session()->put('name', $request->name);
         $request->session()->put('age', $request->age);
         if(setcookie("game", $this->secretNumber, $expire, "/", "", false, true)){
             
             //var_dump($this->secret);
-            $this->combination($request);    
+            $this->combination($request);
+            return true;   
         }else{
             echo "error setting cookie";
+            return false;
         }
     }
 
+    /**
+     * @OA\Get(
+     *    path="game/combinate/{number}",
+     *    operationId="play",
+     *    summary="Play a turn in the game",
+     *    description="Play a turn in the game of cows and bulls",
+     *    @OA\Parameter(name="request", description="The Request object", required=true,
+     *        @OA\Schema(type="Request")
+     *    ),
+     *    @OA\Parameter(name="number", description="The number to guess", required=true,
+     *        @OA\Schema(type="string")
+     *    ),
+     *     @OA\Response(
+     *          response=200,
+     *          description="Success",
+     *          @OA\JsonContent(
+     *          @OA\Property(property="status_code", type="integer", example="200"),
+     *           ),
+     *        )
+     *       )
+     *  )
+     */
     /**
      * Excecute a "move" in the game, a turn. 
      * @param int $number
@@ -61,11 +132,6 @@ class GameController extends Controller
                 
                 //return response()->json($this->game->combinate($request, $_COOKIE['game'], $number));
                 echo response()->json($this->game->combinate($request, $_COOKIE['game'], $number));
-                
-                if($request->session()->get('gameover') == 1){
-                    die("computed ran");
-                    $this->computeRank($request);
-                }
                 
             }else{
                 // todo: call something to save the data

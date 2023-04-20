@@ -105,7 +105,7 @@ class Games extends Model
         echo "Attempts: ".$request->session()->get('attempts')."<br>";
         
         $this->saveData($request);
-        $this->cleanSession($request); 
+        $this->cleanSession($request);
     }
 
     /**
@@ -197,7 +197,7 @@ class Games extends Model
         $seconds = $timeleft->format('%s');
         $minutes = $timeleft->format('%i');
         $totalsecondes = $minutes*60 + $seconds;
-        return EXPIRE - $totalsecondes;
+        return EXPIRE_IN - $totalsecondes;
     }
 
     /**
