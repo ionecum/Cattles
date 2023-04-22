@@ -31,9 +31,16 @@ Since no frontend is connected to the project, I'm unsure about what kind of sta
 
 ### Technical Warnings
 I. The data consists of name, age, secret_number,score,nb_attempts,evaluation,outcome and rank. It has been stored in a single table because it was a requirement, but in real life, this would be incorrect, since storing these value on a single table would normally break database normalization. 
+
 II. The project will not use user's authentication because this was not in the requirements. In real life you would use a session within the authenticated user's session to time limit the game. This is difficult to perform withtout authenticated users.
+
 III. I have decided to handle endpoints using ordinary http queries through routes/web, because a restful api is basically an interface that receives a query and returns a response in JSON format. I know Laravel has Sanctum and ressourceful routes for API handling, but these are advanced features that are unnecessary for this exercise, plus it was not in the requirements.
+
 IV. The business logic lives in the model but the secret number is generated in the controller. Generating it from the controller or the model directly, doesn't make a true difference, I decided to generate it in the controller, so all the inputs come from the same place.
+
 V. The secret number is stored into a cookie, the other persistent data such as name, age, etc, are stored in a session variable. This because the cookie is a more natural choice for something that will expire after a limited time and the game life is strictly related to the secret number. Hence, the secret number will expire with the game. It would be nice to store everything in the same place, but, in PHP you can't store an array in a cookie, so I decided to store the secret number in a cookie.
+
 VI. I tested most of the application by checking the outputs directly, because I'm not very familiar with testing facilities in Laravel. The last time I used it was 3 years ago.
 
+FINAL NOTE:
+The organization of the code is not perfect because I initially made the mistake to assume that models had to be saved from the model directly, instead than from the controller. Assuming this I have concentrated on the business logic leaving the data persistence aspect last. After all, according to good practices, data persistence should occur in models, not controllers. When I realized the mistake, it was too late, so I leaved the code as is. I'm sorry for the inconvenience but I hadn't used Laravel for 3 years and when I did it wasn't for anything exceptional. 
