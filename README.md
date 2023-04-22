@@ -15,7 +15,7 @@ Each request to this url is a "move" in the game. By default the game runs in te
 
 To end the game, simply put a number that matches the secret number. Additional information will be shown, including the database query that was executed. And all the session data will be cleaned up. If you press F5 at that time, you will get an empty board.
 
-If you want a true JSON response, simply comment the line
+If you want a true JSON response, simply comment the line [I didn't know yet that I had the /api/ route in Laravel, now I know]:
 
 `echo response()->json($this->game->combinate($request, $_COOKIE['game'], $number));`
 
